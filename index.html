@@ -1,0 +1,1600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#FFFFFF">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="description" content="Professional QR code generator. Create QR codes for URL, WiFi, WhatsApp, Instagram, TikTok, vCard and 15+ types. Free, unlimited, works offline.">
+<meta name="keywords" content="QR code generator, WiFi QR, WhatsApp QR, Instagram QR, vCard QR, free QR generator">
+<title>QR Studio — Professional QR Code Generator</title>
+<link rel="manifest" href="manifest.json">
+
+<!-- AdSense: Paste your auto-ads script here after approval -->
+</head>
+
+<style>
+/* ========== RESET ========== */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;overscroll-behavior:none}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',Roboto,system-ui,sans-serif;
+  background:#F5F7FA;color:#0F172A;
+  -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
+  font-feature-settings:'cv02','cv03','cv04','cv11';
+}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;outline:none}
+input,textarea,select{font-family:inherit;outline:none}
+svg{display:block;flex-shrink:0}
+
+/* ========== APP SHELL ========== */
+.app{
+  width:100%;height:100dvh;max-width:480px;margin:0 auto;
+  display:flex;flex-direction:column;
+  background:#FFFFFF;position:relative;overflow:hidden;
+  box-shadow:0 0 0 1px rgba(15,23,42,.04);
+}
+
+/* ========== HEADER ========== */
+.hdr{
+  display:flex;align-items:center;gap:12px;
+  padding:16px 20px 14px;
+  padding-top:calc(16px + env(safe-area-inset-top,0px));
+  background:#FFFFFF;
+  border-bottom:1px solid #F1F5F9;
+  position:relative;z-index:5;
+}
+.hdr-brand{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+.hdr-logo{
+  width:36px;height:36px;border-radius:10px;
+  background:linear-gradient(135deg,#4F46E5,#7C3AED);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 12px rgba(79,70,229,.28);
+}
+.hdr-logo svg{width:19px;height:19px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.hdr-info{min-width:0;flex:1}
+.hdr-title{
+  font-size:15px;font-weight:800;letter-spacing:-.4px;
+  color:#0F172A;line-height:1.15;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.hdr-sub{
+  font-size:10px;font-weight:700;letter-spacing:.7px;
+  color:#94A3B8;text-transform:uppercase;margin-top:3px;
+}
+.hdr-btn{
+  width:38px;height:38px;border-radius:11px;
+  background:#F1F5F9;color:#475569;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;transition:all .18s cubic-bezier(.4,0,.2,1);
+}
+.hdr-btn:active{transform:scale(.92);background:#E2E8F0}
+.hdr-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.hdr-btn .badge{
+  position:absolute;top:-3px;right:-3px;
+  min-width:17px;height:17px;padding:0 4px;
+  background:#EF4444;color:#fff;
+  border:2px solid #fff;border-radius:9px;
+  font-size:9.5px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;
+  transform:scale(0);transition:transform .3s cubic-bezier(.34,1.5,.64,1);
+  line-height:1;
+}
+.hdr-btn .badge.show{transform:scale(1)}
+
+/* ========== PROGRESS ========== */
+.prog{
+  padding:14px 20px 0;
+  background:#FFFFFF;
+  border-bottom:1px solid #F1F5F9;
+}
+.prog-rail{
+  height:4px;background:#F1F5F9;border-radius:99px;
+  overflow:hidden;
+}
+.prog-fill{
+  height:100%;width:25%;border-radius:99px;
+  background:linear-gradient(90deg,#4F46E5,#7C3AED);
+  transition:width .5s cubic-bezier(.4,0,.2,1);
+  box-shadow:0 0 8px rgba(79,70,229,.35);
+}
+.prog-labels{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:4px;margin:9px 0 12px;
+}
+.prog-labels span{
+  font-size:9.5px;font-weight:800;letter-spacing:.7px;
+  text-transform:uppercase;color:#CBD5E1;text-align:center;
+  transition:color .3s;
+}
+.prog-labels span:first-child{text-align:left}
+.prog-labels span:last-child{text-align:right}
+.prog-labels span.active{color:#4F46E5}
+
+/* ========== MAIN ========== */
+.main{
+  flex:1;overflow-y:auto;overflow-x:hidden;
+  padding:22px 20px 24px;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+.main::-webkit-scrollbar{display:none}
+
+.pane{display:none}
+.pane.active{display:block;animation:paneIn .38s cubic-bezier(.4,0,.2,1)}
+.pane.active.back{animation:paneBack .38s cubic-bezier(.4,0,.2,1)}
+@keyframes paneIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
+@keyframes paneBack{from{opacity:0;transform:translateX(-16px)}to{opacity:1;transform:translateX(0)}}
+
+.pane-h1{
+  font-size:22px;font-weight:800;letter-spacing:-.55px;
+  color:#0F172A;line-height:1.2;margin-bottom:6px;
+}
+.pane-h2{
+  font-size:13.5px;font-weight:500;color:#64748B;
+  line-height:1.5;margin-bottom:20px;
+}
+
+/* ========== CATEGORY TABS ========== */
+.cat-tabs{
+  display:flex;gap:4px;padding:4px;
+  background:#F1F5F9;border-radius:12px;margin-bottom:18px;
+  overflow-x:auto;scrollbar-width:none;
+}
+.cat-tabs::-webkit-scrollbar{display:none}
+.cat-tab{
+  flex:1;padding:9px 12px;border-radius:9px;
+  font-size:12px;font-weight:700;color:#64748B;
+  white-space:nowrap;transition:all .2s;
+  letter-spacing:-.1px;
+}
+.cat-tab.active{
+  background:#FFFFFF;color:#4F46E5;
+  box-shadow:0 1px 3px rgba(15,23,42,.08);
+}
+
+/* ========== TYPE GRID ========== */
+.type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.type-card{
+  padding:15px 8px 11px;border-radius:14px;
+  background:#FFFFFF;border:1.5px solid #E2E8F0;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  transition:all .22s cubic-bezier(.4,0,.2,1);
+  animation:cardIn .35s cubic-bezier(.4,0,.2,1) backwards;
+}
+@keyframes cardIn{from{opacity:0;transform:translateY(8px) scale(.94)}to{opacity:1;transform:translateY(0) scale(1)}}
+.type-card:active{transform:scale(.94);background:#F8FAFC}
+.type-card .ic{
+  width:24px;height:24px;
+  stroke:#475569;fill:none;
+  stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;
+  transition:stroke .2s;
+}
+.type-card .lb{
+  font-size:11px;font-weight:700;color:#1E293B;
+  letter-spacing:-.1px;line-height:1.2;text-align:center;
+}
+.type-card.selected{
+  border-color:#4F46E5;background:#EEF2FF;
+  box-shadow:0 0 0 3px rgba(79,70,229,.1);
+}
+.type-card.selected .ic{stroke:#4F46E5}
+.type-card.selected .lb{color:#4F46E5}
+
+/* ========== FORM ========== */
+.field{margin-bottom:18px;animation:fieldIn .35s cubic-bezier(.4,0,.2,1) backwards}
+@keyframes fieldIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.field-hd{
+  display:flex;align-items:baseline;justify-content:space-between;
+  margin-bottom:8px;gap:8px;
+}
+.field-lb{
+  font-size:13px;font-weight:700;color:#0F172A;
+  letter-spacing:-.15px;line-height:1.3;
+}
+.field-lb .req{color:#EF4444;margin-left:2px}
+.field-tag{
+  font-size:10px;font-weight:800;letter-spacing:.6px;
+  text-transform:uppercase;color:#94A3B8;
+}
+.field-hint{
+  font-size:11.5px;font-weight:500;color:#94A3B8;
+  margin-top:-4px;margin-bottom:8px;line-height:1.4;
+}
+.field input,.field textarea,.field select{
+  width:100%;padding:13px 15px;
+  border:1.5px solid #E2E8F0;border-radius:12px;
+  font-size:14.5px;font-weight:500;color:#0F172A;
+  background:#FFFFFF;appearance:none;
+  transition:border-color .18s,box-shadow .18s;
+}
+.field textarea{resize:none;min-height:82px;line-height:1.5}
+.field select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 15px center;
+  padding-right:40px;
+}
+.field input:focus,.field textarea:focus,.field select:focus{
+  border-color:#4F46E5;
+  box-shadow:0 0 0 3px rgba(79,70,229,.1);
+}
+.field input::placeholder,.field textarea::placeholder{color:#CBD5E1;font-weight:400}
+
+/* ========== OPTIONS ========== */
+.opt{margin-bottom:22px}
+.opt-hd{margin-bottom:10px}
+.opt-lb{
+  font-size:13px;font-weight:700;color:#0F172A;
+  letter-spacing:-.15px;
+}
+.opt-hint{
+  font-size:11.5px;font-weight:500;color:#94A3B8;
+  margin-top:3px;line-height:1.4;
+}
+.swatches{display:flex;gap:10px;flex-wrap:wrap}
+.swatch{
+  width:38px;height:38px;border-radius:50%;
+  border:2.5px solid transparent;
+  transition:all .22s cubic-bezier(.34,1.4,.64,1);
+  position:relative;
+}
+.swatch:active{transform:scale(.88)}
+.swatch.selected{
+  border-color:#4F46E5;
+  box-shadow:0 0 0 3px rgba(79,70,229,.15);
+  transform:scale(1.1);
+}
+.swatch.selected::after{
+  content:'';position:absolute;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
+  background-size:58%;background-position:center;background-repeat:no-repeat;
+  filter:drop-shadow(0 1px 2px rgba(0,0,0,.4));
+}
+
+.seg{display:flex;padding:4px;background:#F1F5F9;border-radius:12px;gap:4px}
+.seg button{
+  flex:1;padding:10px 8px;border-radius:9px;
+  font-size:12.5px;font-weight:700;color:#64748B;
+  transition:all .2s;letter-spacing:-.1px;
+}
+.seg button.active{
+  background:#FFFFFF;color:#4F46E5;
+  box-shadow:0 1px 3px rgba(15,23,42,.08);
+}
+
+/* ========== INFO CARD ========== */
+.info-card{
+  display:flex;gap:10px;padding:13px 14px;
+  background:#EEF2FF;border:1px solid #E0E7FF;
+  border-radius:12px;margin-top:18px;
+  animation:fieldIn .4s .15s backwards;
+}
+.info-card svg{
+  width:17px;height:17px;flex-shrink:0;margin-top:1px;
+  stroke:#4F46E5;fill:none;stroke-width:2.2;
+  stroke-linecap:round;stroke-linejoin:round;
+}
+.info-card p{
+  font-size:12px;font-weight:500;color:#3730A3;
+  line-height:1.55;letter-spacing:-.05px;
+}
+.info-card strong{font-weight:800;color:#312E81}
+
+/* ========== RESULT ========== */
+.result{display:flex;flex-direction:column;align-items:center;gap:18px}
+.qr-frame{
+  padding:18px;background:#FFFFFF;border-radius:20px;
+  box-shadow:0 12px 40px rgba(79,70,229,.16),0 0 0 1px rgba(15,23,42,.05);
+  animation:qrPop .55s cubic-bezier(.34,1.4,.64,1);
+  position:relative;
+}
+@keyframes qrPop{0%{opacity:0;transform:scale(.55)}100%{opacity:1;transform:scale(1)}}
+#qrCanvas{display:block;border-radius:10px;image-rendering:pixelated}
+.qr-tags{
+  display:flex;align-items:center;gap:8px;
+  font-size:10.5px;font-weight:800;letter-spacing:.8px;
+  text-transform:uppercase;color:#94A3B8;
+}
+.qr-tags .dot{width:3px;height:3px;border-radius:50%;background:#CBD5E1}
+.qr-tags .t{color:#4F46E5}
+.qr-data{
+  width:100%;padding:12px 15px;
+  background:#F8FAFC;border:1px solid #F1F5F9;
+  border-radius:12px;
+  font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;
+  font-size:11.5px;color:#475569;font-weight:500;
+  word-break:break-all;line-height:1.6;text-align:center;
+  max-height:90px;overflow-y:auto;
+  scrollbar-width:none;
+}
+.qr-data::-webkit-scrollbar{display:none}
+
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+.acts .wide{grid-column:span 2}
+.act{
+  padding:15px 12px;border-radius:13px;
+  font-size:13.5px;font-weight:700;letter-spacing:-.15px;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:all .18s cubic-bezier(.4,0,.2,1);
+  border:1.5px solid transparent;
+}
+.act:active{transform:scale(.96)}
+.act svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.act-pri{
+  background:linear-gradient(135deg,#4F46E5,#7C3AED);
+  color:#FFFFFF;
+  box-shadow:0 8px 22px rgba(79,70,229,.32);
+}
+.act-pri:active{box-shadow:0 4px 12px rgba(79,70,229,.28)}
+.act-sec{
+  background:#FFFFFF;color:#0F172A;
+  border-color:#E2E8F0;
+}
+.act-sec:active{background:#F8FAFC}
+
+/* ========== FOOTER ========== */
+.foot{
+  padding:14px 20px;
+  padding-bottom:calc(14px + env(safe-area-inset-bottom,0px));
+  background:#FFFFFF;border-top:1px solid #F1F5F9;
+  display:flex;gap:10px;align-items:center;
+}
+.foot.hide{display:none}
+.nav-btn{
+  flex:1;padding:15px 20px;border-radius:13px;
+  font-size:14.5px;font-weight:800;letter-spacing:-.2px;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  transition:all .2s cubic-bezier(.4,0,.2,1);
+}
+.nav-btn:active{transform:scale(.97)}
+.nav-btn:disabled{opacity:.35;cursor:not-allowed}
+.nav-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.nav-pri{
+  background:linear-gradient(135deg,#4F46E5,#7C3AED);
+  color:#FFFFFF;
+  box-shadow:0 6px 18px rgba(79,70,229,.28);
+}
+.nav-ghost{
+  flex:0 0 auto;padding:15px 18px;
+  color:#64748B;background:transparent;font-weight:700;
+}
+.nav-ghost:active{color:#0F172A;background:#F1F5F9}
+
+/* ========== BRANDING ========== */
+.brand{
+  position:absolute;bottom:calc(6px + env(safe-area-inset-bottom,0px));
+  right:12px;font-size:9px;font-weight:800;
+  letter-spacing:1px;color:#CBD5E1;
+  text-transform:uppercase;pointer-events:none;z-index:2;
+}
+
+/* ========== HISTORY FULL-SCREEN SLIDE ========== */
+.hist-overlay{
+  position:fixed;inset:0;z-index:200;
+  background:rgba(15,23,42,.35);
+  backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
+  opacity:0;pointer-events:none;
+  transition:opacity .3s;
+}
+.hist-overlay.show{opacity:1;pointer-events:auto}
+
+.hist-panel{
+  position:fixed;top:0;bottom:0;right:0;
+  width:100%;max-width:480px;margin:0 auto;
+  background:#FFFFFF;
+  transform:translateX(100%);
+  transition:transform .4s cubic-bezier(.32,.72,0,1);
+  z-index:201;display:flex;flex-direction:column;
+  box-shadow:-8px 0 40px rgba(15,23,42,.15);
+}
+.hist-panel.show{transform:translateX(0)}
+
+.hist-hd{
+  display:flex;align-items:center;gap:12px;
+  padding:16px 20px 14px;
+  padding-top:calc(16px + env(safe-area-inset-top,0px));
+  border-bottom:1px solid #F1F5F9;
+  background:#FFFFFF;
+}
+.hist-back{
+  width:38px;height:38px;border-radius:11px;
+  background:#F1F5F9;color:#475569;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .18s;
+}
+.hist-back:active{transform:scale(.92);background:#E2E8F0}
+.hist-back svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.hist-title-wrap{flex:1;min-width:0}
+.hist-title{
+  font-size:16px;font-weight:800;color:#0F172A;
+  letter-spacing:-.4px;line-height:1.2;
+}
+.hist-sub{
+  font-size:11px;font-weight:600;color:#94A3B8;
+  margin-top:2px;letter-spacing:-.05px;
+}
+.hist-clear{
+  padding:8px 12px;border-radius:9px;
+  font-size:11.5px;font-weight:800;color:#EF4444;
+  letter-spacing:-.1px;
+  transition:background .18s;
+}
+.hist-clear:active{background:rgba(239,68,68,.08)}
+
+.hist-body{
+  flex:1;overflow-y:auto;overflow-x:hidden;
+  padding:16px 20px 24px;
+  padding-bottom:calc(24px + env(safe-area-inset-bottom,0px));
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+.hist-body::-webkit-scrollbar{display:none}
+
+.hist-group-lb{
+  font-size:10px;font-weight:800;letter-spacing:.9px;
+  text-transform:uppercase;color:#94A3B8;
+  margin:14px 0 8px;padding-left:2px;
+}
+.hist-group-lb:first-child{margin-top:0}
+
+.hist-item{
+  display:flex;align-items:center;gap:12px;
+  padding:13px 14px;margin-bottom:8px;
+  background:#F8FAFC;border:1px solid #F1F5F9;
+  border-radius:13px;
+  transition:all .18s cubic-bezier(.4,0,.2,1);
+  animation:histIn .35s cubic-bezier(.4,0,.2,1) backwards;
+}
+@keyframes histIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+.hist-item:active{transform:scale(.98);background:#F1F5F9;border-color:#E2E8F0}
+.hist-ic{
+  width:38px;height:38px;border-radius:11px;
+  background:#EEF2FF;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+}
+.hist-ic svg{
+  width:18px;height:18px;stroke:#4F46E5;fill:none;
+  stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;
+}
+.hist-info{flex:1;min-width:0}
+.hist-type{
+  font-size:10px;font-weight:800;letter-spacing:.6px;
+  text-transform:uppercase;color:#4F46E5;margin-bottom:3px;
+}
+.hist-data{
+  font-size:12.5px;font-weight:600;color:#0F172A;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  letter-spacing:-.1px;line-height:1.35;
+}
+.hist-time{
+  font-size:11px;font-weight:500;color:#94A3B8;
+  margin-top:2px;
+}
+.hist-del{
+  width:32px;height:32px;border-radius:9px;
+  background:transparent;color:#94A3B8;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:all .18s;
+}
+.hist-del:active{background:rgba(239,68,68,.08);color:#EF4444}
+.hist-del svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+
+.hist-empty{
+  text-align:center;padding:60px 20px 20px;
+  animation:histIn .4s backwards;
+}
+.hist-empty-ic{
+  width:72px;height:72px;margin:0 auto 16px;
+  border-radius:20px;background:#F8FAFC;
+  display:flex;align-items:center;justify-content:center;
+}
+.hist-empty-ic svg{
+  width:32px;height:32px;stroke:#CBD5E1;fill:none;
+  stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;
+}
+.hist-empty h3{
+  font-size:15px;font-weight:800;color:#0F172A;
+  letter-spacing:-.3px;margin-bottom:6px;
+}
+.hist-empty p{
+  font-size:12.5px;font-weight:500;color:#94A3B8;
+  line-height:1.55;
+}
+
+/* ========== TOAST ========== */
+.toasts{
+  position:fixed;top:calc(16px + env(safe-area-inset-top,0px));
+  left:50%;transform:translateX(-50%);
+  width:calc(100% - 32px);max-width:400px;
+  z-index:300;display:flex;flex-direction:column;gap:8px;
+  pointer-events:none;
+}
+.toast{
+  padding:13px 16px;border-radius:13px;
+  background:#0F172A;color:#F8FAFC;
+  font-size:13px;font-weight:600;letter-spacing:-.15px;
+  box-shadow:0 16px 40px rgba(15,23,42,.28);
+  display:flex;align-items:center;gap:11px;
+  transform:translateY(-130%);opacity:0;
+  transition:all .42s cubic-bezier(.34,1.5,.64,1);
+  pointer-events:auto;line-height:1.35;
+}
+.toast.show{transform:translateY(0);opacity:1}
+.toast svg{width:18px;height:18px;flex-shrink:0;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.toast.ok svg{stroke:#34D399}
+.toast.err svg{stroke:#F87171}
+.toast.info svg{stroke:#60A5FA}
+
+/* ========== LOADING ========== */
+.loading{
+  position:fixed;inset:0;z-index:250;
+  background:rgba(255,255,255,.92);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;
+}
+.loading.show{display:flex;animation:fadeIn .2s}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.spin{
+  width:38px;height:38px;border-radius:50%;
+  border:3px solid #E2E8F0;border-top-color:#4F46E5;
+  animation:spin .75s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.load-text{
+  font-size:13px;font-weight:700;color:#64748B;
+  letter-spacing:-.15px;
+}
+
+/* ========== RESPONSIVE ========== */
+@media(min-width:560px){
+  body{padding:0}
+  .app{
+    height:100dvh;border-radius:0;
+  }
+}
+@media(max-width:360px){
+  .pane-h1{font-size:19px}
+  .type-card .lb{font-size:10px}
+  .type-card{padding:13px 6px 10px}
+  .type-card .ic{width:22px;height:22px}
+  .field input,.field textarea,.field select{padding:12px 13px;font-size:14px}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- HEADER -->
+  <header class="hdr">
+    <div class="hdr-brand">
+      <div class="hdr-logo">
+        <svg viewBox="0 0 24 24">
+          <rect x="3" y="3" width="7" height="7" rx="1.5"/>
+          <rect x="14" y="3" width="7" height="7" rx="1.5"/>
+          <rect x="3" y="14" width="7" height="7" rx="1.5"/>
+          <path d="M14 14h3v3h-3zM19 14h2M19 19h2M14 19h2"/>
+        </svg>
+      </div>
+      <div class="hdr-info">
+        <div class="hdr-title">QR Studio</div>
+        <div class="hdr-sub">Professional Generator</div>
+      </div>
+    </div>
+    <button class="hdr-btn" id="histBtn" aria-label="History">
+      <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg>
+      <span class="badge" id="histBadge">0</span>
+    </button>
+  </header>
+
+  <!-- PROGRESS -->
+  <div class="prog">
+    <div class="prog-rail"><div class="prog-fill" id="progFill"></div></div>
+    <div class="prog-labels">
+      <span data-lb="1" class="active">Type</span>
+      <span data-lb="2">Details</span>
+      <span data-lb="3">Design</span>
+      <span data-lb="4">Result</span>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <main class="main" id="main">
+
+    <!-- STEP 1 -->
+    <section class="pane active" data-pane="1">
+      <h1 class="pane-h1">Choose a type</h1>
+      <p class="pane-h2">Select the kind of QR code you want to create.</p>
+
+      <div class="cat-tabs" id="catTabs">
+        <button class="cat-tab active" data-cat="popular">Popular</button>
+        <button class="cat-tab" data-cat="social">Social</button>
+        <button class="cat-tab" data-cat="contact">Contact</button>
+        <button class="cat-tab" data-cat="advanced">Advanced</button>
+      </div>
+
+      <div class="type-grid" id="typeGrid"></div>
+    </section>
+
+    <!-- STEP 2 -->
+    <section class="pane" data-pane="2">
+      <h1 class="pane-h1" id="t2Title">Enter details</h1>
+      <p class="pane-h2" id="t2Sub">Fill in the information below.</p>
+      <div id="formFields"></div>
+    </section>
+
+    <!-- STEP 3 -->
+    <section class="pane" data-pane="3">
+      <h1 class="pane-h1">Customize design</h1>
+      <p class="pane-h2">Personalize the colors and size of your QR code.</p>
+
+      <div class="opt">
+        <div class="opt-hd">
+          <div class="opt-lb">Foreground color</div>
+          <div class="opt-hint">The color of the QR code pattern.</div>
+        </div>
+        <div class="swatches" id="fgSwatches"></div>
+      </div>
+
+      <div class="opt">
+        <div class="opt-hd">
+          <div class="opt-lb">Background color</div>
+          <div class="opt-hint">The color behind the QR code pattern.</div>
+        </div>
+        <div class="swatches" id="bgSwatches"></div>
+      </div>
+
+      <div class="opt">
+        <div class="opt-hd">
+          <div class="opt-lb">QR code size</div>
+          <div class="opt-hint">Larger size produces a higher-resolution PNG.</div>
+        </div>
+        <div class="seg" id="sizeSeg">
+          <button data-size="6">Small</button>
+          <button data-size="10" class="active">Medium</button>
+          <button data-size="16">Large</button>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        <p><strong>Lifetime validity.</strong> This QR code never expires. It is generated entirely on your device and does not depend on any server, so it will keep working as long as the destination stays available.</p>
+      </div>
+    </section>
+
+    <!-- STEP 4 -->
+    <section class="pane" data-pane="4">
+      <h1 class="pane-h1" style="text-align:center">Your QR code is ready</h1>
+      <p class="pane-h2" style="text-align:center">Scan it, share it, or download as a high-quality PNG.</p>
+
+      <div class="result">
+        <div class="qr-frame">
+          <canvas id="qrCanvas"></canvas>
+        </div>
+        <div class="qr-tags">
+          <span class="t" id="resultType">URL</span>
+          <span class="dot"></span>
+          <span id="resultDate">—</span>
+        </div>
+        <div class="qr-data" id="resultData"></div>
+
+        <div class="acts">
+          <button class="act act-sec" id="copyBtn">
+            <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copy Data
+          </button>
+          <button class="act act-sec" id="shareBtn">
+            <svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
+            Share
+          </button>
+          <button class="act act-pri wide" id="downloadBtn">
+            <svg viewBox="0 0 24 24"><path d="M12 3v14M7 12l5 5 5-5M5 21h14"/></svg>
+            Download PNG
+          </button>
+          <button class="act act-sec wide" id="newBtn">
+            <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+            Create New QR Code
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="foot" id="foot">
+    <button class="nav-btn nav-ghost" id="backBtn" style="display:none">
+      <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back
+    </button>
+    <button class="nav-btn nav-pri" id="nextBtn" disabled>
+      Continue
+      <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </footer>
+
+  <!-- BRANDING -->
+  <div class="brand">QR Studio</div>
+
+</div>
+
+<!-- HISTORY OVERLAY + PANEL -->
+<div class="hist-overlay" id="histOverlay"></div>
+
+<aside class="hist-panel" id="histPanel">
+  <div class="hist-hd">
+    <button class="hist-back" id="histBack" aria-label="Back">
+      <svg viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    </button>
+    <div class="hist-title-wrap">
+      <div class="hist-title">History</div>
+      <div class="hist-sub" id="histSub">Your recent QR codes</div>
+    </div>
+    <button class="hist-clear" id="histClear">Clear</button>
+  </div>
+  <div class="hist-body" id="histBody"></div>
+</aside>
+
+<!-- TOASTS -->
+<div class="toasts" id="toasts"></div>
+
+<!-- LOADING -->
+<div class="loading" id="loading">
+  <div class="spin"></div>
+  <div class="load-text" id="loadText">Generating QR code...</div>
+</div>
+
+<!-- QR LIBRARY -->
+<script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+<script>
+if(typeof qrcode==='undefined'){
+  var _s=document.createElement('script');
+  _s.src='https://unpkg.com/qrcode-generator@1.4.4/qrcode.js';
+  document.head.appendChild(_s);
+}
+</script>
+
+<script>
+/* ==========================================================
+   QR STUDIO — Final Build
+   ========================================================== */
+
+/* ---------- ICONS ---------- */
+const IC = {
+  url:'<rect x="2" y="4" width="20" height="16" rx="3"/><path d="M2 8h20M8 4v4M16 4v4"/><circle cx="12" cy="14" r="2"/>',
+  text:'<path d="M4 7V5h16v2M9 19h6M12 5v14"/>',
+  wifi:'<path d="M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0"/><circle cx="12" cy="19.5" r="1.2" fill="currentColor" stroke="none"/><path d="M2 9a15 15 0 0 1 20 0"/>',
+  email:'<rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 6 10-6"/>',
+  phone:'<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.3 1.8.6 2.6a2 2 0 0 1-.5 2.1L8 9.5a16 16 0 0 0 6 6l1.1-1.1a2 2 0 0 1 2.1-.5c.8.3 1.7.5 2.6.6a2 2 0 0 1 1.7 2z"/>',
+  sms:'<path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5z"/>',
+  whatsapp:'<path d="M3 21l1.7-5A8.5 8.5 0 1 1 8 19.3z"/><path d="M8.5 9.5c.3 2 2 3.7 4 4l1-1c.3-.3.7-.4 1-.2l1.5.7c.3.1.5.5.4.8-.3 1-1.4 1.7-2.4 1.5-3-.6-5.4-3-6-6-.2-1 .5-2.1 1.5-2.4.3-.1.7.1.8.4l.7 1.5c.2.3.1.7-.2 1z"/>',
+  instagram:'<rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>',
+  tiktok:'<path d="M14 4v11.5a4.5 4.5 0 1 1-4-4.5"/><path d="M14 4a5 5 0 0 0 5 5"/>',
+  facebook:'<path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>',
+  youtube:'<rect x="2" y="5" width="20" height="14" rx="4"/><path d="M10 9l5 3-5 3z" fill="currentColor" stroke="none"/>',
+  twitter:'<path d="M4 4l7.5 9.8L4.3 20H7l6-6.3L17.5 20H21l-7.8-10L20.5 4H18l-5.4 5.7L9 4z" fill="currentColor" stroke="none"/>',
+  telegram:'<path d="M21 3L3 11l5 2 2 7 3-4 5 4 3-17z"/>',
+  vcard:'<rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="8" cy="12" r="2.5"/><path d="M13 10h5M13 13h5M13 16h3M5 16c.8-1.5 2-2 3-2s2.2.5 3 2"/>',
+  location:'<path d="M12 22s8-7.5 8-13a8 8 0 1 0-16 0c0 5.5 8 13 8 13z"/><circle cx="12" cy="9" r="3"/>',
+  trash:'<path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>'
+};
+
+/* ---------- TYPES ---------- */
+const TYPES = {
+  url:      {cat:'popular', label:'URL',       icon:'url'},
+  text:     {cat:'popular', label:'Text',      icon:'text'},
+  whatsapp: {cat:'popular', label:'WhatsApp',  icon:'whatsapp'},
+  wifi:     {cat:'popular', label:'Wi-Fi',     icon:'wifi'},
+  email:    {cat:'popular', label:'Email',     icon:'email'},
+  phone:    {cat:'popular', label:'Phone',     icon:'phone'},
+  instagram:{cat:'social',  label:'Instagram', icon:'instagram'},
+  tiktok:   {cat:'social',  label:'TikTok',    icon:'tiktok'},
+  facebook: {cat:'social',  label:'Facebook',  icon:'facebook'},
+  youtube:  {cat:'social',  label:'YouTube',   icon:'youtube'},
+  twitter:  {cat:'social',  label:'X',         icon:'twitter'},
+  telegram: {cat:'social',  label:'Telegram',  icon:'telegram'},
+  sms:      {cat:'contact', label:'SMS',       icon:'sms'},
+  vcard:    {cat:'contact', label:'Contact',   icon:'vcard'},
+  location: {cat:'advanced',label:'Location',  icon:'location'}
+};
+
+/* ---------- FORMS ---------- */
+const FORMS = {
+  url:{
+    title:'Website URL',
+    sub:'Enter the web address you want to share.',
+    fields:[
+      {id:'url', label:'Website link', req:true, type:'url',
+       hint:'Include the full address, for example: www.example.com',
+       ph:'https://www.example.com', im:'url'}
+    ],
+    build:v=>{let u=(v.url||'').trim();if(u&&!/^https?:\/\//i.test(u))u='https://'+u;return u;},
+    valid:v=>v.url && v.url.trim().length>3
+  },
+  text:{
+    title:'Plain Text',
+    sub:'Enter any message up to 1000 characters.',
+    fields:[
+      {id:'text', label:'Text message', req:true, type:'textarea',
+       hint:'The scanner will see this text instantly.',
+       ph:'Type your message here...'}
+    ],
+    build:v=>(v.text||'').trim(),
+    valid:v=>v.text && v.text.trim().length>0
+  },
+  whatsapp:{
+    title:'WhatsApp Message',
+    sub:'Scanning opens a WhatsApp chat with a pre-filled message.',
+    fields:[
+      {id:'phone', label:'Phone number with country code', req:true, type:'tel',
+       hint:'Example: +1 415 555 0123 (United States)',
+       ph:'+1 415 555 0123', im:'tel'},
+      {id:'msg', label:'Pre-filled message', type:'textarea',
+       hint:'This message will appear in the chat automatically.',
+       ph:'Hello! I would like to know more about your service.'}
+    ],
+    build:v=>{
+      const p=(v.phone||'').replace(/[^\d]/g,'');
+      const m=(v.msg||'').trim();
+      return m?`https://wa.me/${p}?text=${encodeURIComponent(m)}`:`https://wa.me/${p}`;
+    },
+    valid:v=>v.phone && v.phone.replace(/[^\d]/g,'').length>=7
+  },
+  wifi:{
+    title:'Wi-Fi Network',
+    sub:'Scanning connects a phone to your Wi-Fi automatically.',
+    fields:[
+      {id:'ssid', label:'Network name (SSID)', req:true, type:'text',
+       hint:'The exact name that appears in the Wi-Fi list.',
+       ph:'HomeNetwork'},
+      {id:'pass', label:'Network password', type:'text',
+       hint:'Case-sensitive. Leave empty for open networks.',
+       ph:'Enter password'},
+      {id:'sec', label:'Security type', req:true, type:'select',
+       hint:'Choose the encryption used by the network.',
+       opts:[
+         {v:'WPA',t:'WPA / WPA2 / WPA3 (most common)'},
+         {v:'WEP',t:'WEP (older routers)'},
+         {v:'nopass',t:'None (open network)'}
+       ]}
+    ],
+    build:v=>{
+      const esc=s=>String(s||'').replace(/([\\;,":])/g,'\\$1');
+      const s=esc((v.ssid||'').trim()),p=esc((v.pass||'').trim());
+      const sec=v.sec||'WPA';
+      if(sec==='nopass')return `WIFI:T:nopass;S:${s};H:false;;`;
+      return `WIFI:T:${sec};S:${s};P:${p};H:false;;`;
+    },
+    valid:v=>v.ssid && v.ssid.trim().length>0
+  },
+  email:{
+    title:'Email Address',
+    sub:'Scanning opens the email app with details filled in.',
+    fields:[
+      {id:'to', label:'Recipient email address', req:true, type:'email',
+       hint:'Where the message will be sent.',
+       ph:'contact@example.com', im:'email'},
+      {id:'subject', label:'Subject line', type:'text',
+       hint:'Optional. Appears as the email subject.',
+       ph:'Inquiry about your service'},
+      {id:'body', label:'Message body', type:'textarea',
+       hint:'Optional. Pre-fills the email message.',
+       ph:'Write your message...'}
+    ],
+    build:v=>{
+      const p=[];
+      if((v.subject||'').trim())p.push('subject='+encodeURIComponent(v.subject.trim()));
+      if((v.body||'').trim())p.push('body='+encodeURIComponent(v.body.trim()));
+      return 'mailto:'+(v.to||'').trim()+(p.length?'?'+p.join('&'):'');
+    },
+    valid:v=>v.to && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.to.trim())
+  },
+  phone:{
+    title:'Phone Number',
+    sub:'Scanning opens the dialer with the number ready to call.',
+    fields:[
+      {id:'phone', label:'Phone number', req:true, type:'tel',
+       hint:'Include the country code, for example: +44 20 7946 0000',
+       ph:'+1 415 555 0123', im:'tel'}
+    ],
+    build:v=>'tel:'+(v.phone||'').trim().replace(/[\s()-]/g,''),
+    valid:v=>v.phone && v.phone.replace(/[^\d]/g,'').length>=5
+  },
+  sms:{
+    title:'SMS Message',
+    sub:'Scanning opens the messaging app with a pre-filled text.',
+    fields:[
+      {id:'phone', label:'Phone number', req:true, type:'tel',
+       hint:'Include the country code.',
+       ph:'+1 415 555 0123', im:'tel'},
+      {id:'message', label:'Message text', type:'textarea',
+       hint:'Optional. Pre-fills the SMS body.',
+       ph:'Your message here...'}
+    ],
+    build:v=>{
+      const p=(v.phone||'').trim().replace(/[\s()-]/g,'');
+      const m=(v.message||'').trim();
+      return m?`SMSTO:${p}:${m}`:`SMSTO:${p}`;
+    },
+    valid:v=>v.phone && v.phone.replace(/[^\d]/g,'').length>=5
+  },
+  instagram:{
+    title:'Instagram Profile',
+    sub:'Scanning opens your Instagram profile.',
+    fields:[
+      {id:'user', label:'Instagram username', req:true, type:'text',
+       hint:'Do not include the @ symbol.',
+       ph:'yourusername'}
+    ],
+    build:v=>'https://instagram.com/'+(v.user||'').trim().replace(/^@/,''),
+    valid:v=>v.user && v.user.trim().length>0
+  },
+  tiktok:{
+    title:'TikTok Profile',
+    sub:'Scanning opens your TikTok profile.',
+    fields:[
+      {id:'user', label:'TikTok username', req:true, type:'text',
+       hint:'Do not include the @ symbol.',
+       ph:'yourusername'}
+    ],
+    build:v=>'https://tiktok.com/@'+(v.user||'').trim().replace(/^@/,''),
+    valid:v=>v.user && v.user.trim().length>0
+  },
+  facebook:{
+    title:'Facebook Page',
+    sub:'Scanning opens your Facebook page or profile.',
+    fields:[
+      {id:'user', label:'Facebook page or profile name', req:true, type:'text',
+       hint:'The exact page or profile identifier.',
+       ph:'yourpage'}
+    ],
+    build:v=>'https://facebook.com/'+(v.user||'').trim(),
+    valid:v=>v.user && v.user.trim().length>0
+  },
+  youtube:{
+    title:'YouTube Channel',
+    sub:'Scanning opens your YouTube channel.',
+    fields:[
+      {id:'user', label:'Channel handle or URL', req:true, type:'text',
+       hint:'You can enter the handle with or without the @ symbol.',
+       ph:'@yourchannel'}
+    ],
+    build:v=>{
+      let u=(v.user||'').trim();
+      if(u.startsWith('@'))u=u.slice(1);
+      if(/youtube\.com|youtu\.be/i.test(u))return u.startsWith('http')?u:'https://'+u;
+      return 'https://youtube.com/@'+u;
+    },
+    valid:v=>v.user && v.user.trim().length>0
+  },
+  twitter:{
+    title:'X (Twitter) Profile',
+    sub:'Scanning opens your X profile.',
+    fields:[
+      {id:'user', label:'X username', req:true, type:'text',
+       hint:'Do not include the @ symbol.',
+       ph:'yourusername'}
+    ],
+    build:v=>'https://x.com/'+(v.user||'').trim().replace(/^@/,''),
+    valid:v=>v.user && v.user.trim().length>0
+  },
+  telegram:{
+    title:'Telegram',
+    sub:'Scanning opens a Telegram chat or channel.',
+    fields:[
+      {id:'user', label:'Telegram username', req:true, type:'text',
+       hint:'Do not include the @ symbol.',
+       ph:'yourusername'}
+    ],
+    build:v=>'https://t.me/'+(v.user||'').trim().replace(/^@/,''),
+    valid:v=>v.user && v.user.trim().length>0
+  },
+  vcard:{
+    title:'Contact Card',
+    sub:'Scanning saves you to the phone contacts.',
+    fields:[
+      {id:'first', label:'First name', req:true, type:'text',
+       hint:'Your given name.', ph:'John'},
+      {id:'last', label:'Last name', type:'text',
+       hint:'Your family name.', ph:'Smith'},
+      {id:'phone', label:'Phone number', type:'tel',
+       hint:'Include the country code.', ph:'+1 415 555 0123', im:'tel'},
+      {id:'email', label:'Email address', type:'email',
+       hint:'Your contact email.', ph:'john@example.com', im:'email'},
+      {id:'org', label:'Organization', type:'text',
+       hint:'Company or brand name.', ph:'Acme Inc.'},
+      {id:'web', label:'Website', type:'url',
+       hint:'Your personal or business website.', ph:'https://example.com', im:'url'}
+    ],
+    build:v=>{
+      const L=['BEGIN:VCARD','VERSION:3.0'];
+      L.push('N:'+(v.last||'')+';'+(v.first||'')+';;;');
+      L.push('FN:'+((v.first||'')+' '+(v.last||'')).trim());
+      if(v.org)L.push('ORG:'+v.org);
+      if(v.phone)L.push('TEL;TYPE=CELL:'+v.phone);
+      if(v.email)L.push('EMAIL:'+v.email);
+      if(v.web)L.push('URL:'+v.web);
+      L.push('END:VCARD');
+      return L.join('\n');
+    },
+    valid:v=>v.first && v.first.trim().length>0
+  },
+  location:{
+    title:'Location',
+    sub:'Scanning opens the location in the default maps app.',
+    fields:[
+      {id:'lat', label:'Latitude', req:true, type:'text',
+       hint:'Example: 40.7128 (positive for North, negative for South)',
+       ph:'40.7128', im:'decimal'},
+      {id:'lng', label:'Longitude', req:true, type:'text',
+       hint:'Example: -74.0060 (positive for East, negative for West)',
+       ph:'-74.0060', im:'decimal'},
+      {id:'name', label:'Place name', type:'text',
+       hint:'Optional label shown on the map.',
+       ph:'New York City'}
+    ],
+    build:v=>{
+      const la=parseFloat(v.lat),ln=parseFloat(v.lng);
+      if(isNaN(la)||isNaN(ln))return '';
+      return `geo:${la},${ln}`+(v.name?`?q=${la},${ln}(${encodeURIComponent(v.name)})`:'');
+    },
+    valid:v=>{
+      const la=parseFloat(v.lat),ln=parseFloat(v.lng);
+      return !isNaN(la)&&!isNaN(ln)&&la>=-90&&la<=90&&ln>=-180&&ln<=180;
+    }
+  }
+};
+
+const FG_COLORS=['#0F172A','#4F46E5','#7C3AED','#EC4899','#10B981','#EF4444','#F59E0B','#0EA5E9'];
+const BG_COLORS=['#FFFFFF','#FEF3C7','#DBEAFE','#FCE7F3','#DCFCE7','#F3E8FF','#FEE2E2','#0F172A'];
+
+/* ---------- STATE ---------- */
+const state={
+  step:1, cat:'popular', type:null,
+  fg:'#0F172A', bg:'#FFFFFF', size:10,
+  data:'', history:[]
+};
+
+/* ---------- HELPERS ---------- */
+const $=s=>document.querySelector(s);
+const $$=s=>document.querySelectorAll(s);
+
+function toast(msg,type='info'){
+  const wrap=$('#toasts');
+  const el=document.createElement('div');
+  el.className='toast '+type;
+  const icons={
+    ok:'<polyline points="20 6 9 17 4 12"/>',
+    err:'<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>',
+    info:'<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>'
+  };
+  el.innerHTML=`<svg viewBox="0 0 24 24">${icons[type]||icons.info}</svg><span>${msg}</span>`;
+  wrap.appendChild(el);
+  requestAnimationFrame(()=>el.classList.add('show'));
+  setTimeout(()=>{
+    el.classList.remove('show');
+    setTimeout(()=>el.remove(),420);
+  },2600);
+}
+
+function fmtDate(ts){
+  return new Date(ts).toLocaleDateString('en-US',{day:'numeric',month:'short',year:'numeric'});
+}
+function timeAgo(ts){
+  const s=Math.floor((Date.now()-ts)/1000);
+  if(s<60)return 'Just now';
+  if(s<3600)return Math.floor(s/60)+' min ago';
+  if(s<86400)return Math.floor(s/3600)+' hr ago';
+  if(s<604800)return Math.floor(s/86400)+' days ago';
+  return fmtDate(ts);
+}
+
+/* ---------- HISTORY ---------- */
+function loadHistory(){
+  try{state.history=JSON.parse(localStorage.getItem('qr_history')||'[]');}
+  catch(e){state.history=[];}
+  updateBadge();
+}
+function saveHistory(){
+  try{localStorage.setItem('qr_history',JSON.stringify(state.history.slice(0,50)));}
+  catch(e){}
+  updateBadge();
+}
+function addHistory(entry){
+  state.history.unshift(entry);
+  state.history=state.history.slice(0,50);
+  saveHistory();
+}
+function updateBadge(){
+  const b=$('#histBadge');
+  b.textContent=state.history.length;
+  b.classList.toggle('show',state.history.length>0);
+  $('#histSub').textContent=state.history.length===0?'No QR codes yet':`${state.history.length} QR code${state.history.length===1?'':'s'} saved`;
+}
+
+/* ---------- STEP NAV ---------- */
+function setStep(n,back=false){
+  state.step=n;
+  $$('.pane').forEach(p=>p.classList.remove('active','back'));
+  const pane=document.querySelector(`.pane[data-pane="${n}"]`);
+  pane.classList.add('active');
+  if(back)pane.classList.add('back');
+
+  $('#progFill').style.width=(n*25)+'%';
+  $$('[data-lb]').forEach(lb=>lb.classList.toggle('active',parseInt(lb.dataset.lb)===n));
+
+  $('#backBtn').style.display=n>1?'flex':'none';
+  $('#foot').classList.toggle('hide',n===4);
+
+  const nextBtn=$('#nextBtn');
+  if(n===1){
+    nextBtn.innerHTML='Continue <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+    nextBtn.disabled=!state.type;
+  }else if(n===2){
+    nextBtn.innerHTML='Continue <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+    validateForm();
+  }else if(n===3){
+    nextBtn.innerHTML='Generate QR <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>';
+    nextBtn.disabled=false;
+  }
+  $('#main').scrollTop=0;
+}
+
+/* ---------- STEP 1 ---------- */
+function renderTypeGrid(){
+  const grid=$('#typeGrid');
+  grid.innerHTML='';
+  const entries=Object.entries(TYPES).filter(([k,t])=>t.cat===state.cat);
+  entries.forEach(([key,t],i)=>{
+    const btn=document.createElement('button');
+    btn.className='type-card';
+    btn.dataset.type=key;
+    btn.style.animationDelay=(i*.03)+'s';
+    btn.innerHTML=`<svg class="ic" viewBox="0 0 24 24">${IC[t.icon]}</svg><span class="lb">${t.label}</span>`;
+    if(state.type===key)btn.classList.add('selected');
+    grid.appendChild(btn);
+  });
+}
+$('#catTabs').addEventListener('click',e=>{
+  const tab=e.target.closest('.cat-tab');if(!tab)return;
+  $$('.cat-tab').forEach(t=>t.classList.remove('active'));
+  tab.classList.add('active');
+  state.cat=tab.dataset.cat;
+  renderTypeGrid();
+});
+$('#typeGrid').addEventListener('click',e=>{
+  const c=e.target.closest('.type-card');if(!c)return;
+  $$('.type-card').forEach(x=>x.classList.remove('selected'));
+  c.classList.add('selected');
+  state.type=c.dataset.type;
+  state.data='';
+  $('#nextBtn').disabled=false;
+  if(navigator.vibrate)navigator.vibrate(8);
+});
+
+/* ---------- STEP 2 ---------- */
+function renderForm(){
+  const cfg=FORMS[state.type];if(!cfg)return;
+  $('#t2Title').textContent=cfg.title;
+  $('#t2Sub').textContent=cfg.sub;
+  const wrap=$('#formFields');
+  wrap.innerHTML='';
+  cfg.fields.forEach((f,i)=>{
+    const g=document.createElement('div');
+    g.className='field';
+    g.style.animationDelay=(i*.04)+'s';
+
+    const hd=document.createElement('div');
+    hd.className='field-hd';
+    hd.innerHTML=`<span class="field-lb">${f.label}${f.req?'<span class="req">*</span>':''}</span>${!f.req?'<span class="field-tag">Optional</span>':''}`;
+    g.appendChild(hd);
+
+    if(f.hint){
+      const hint=document.createElement('div');
+      hint.className='field-hint';
+      hint.textContent=f.hint;
+      g.appendChild(hint);
+    }
+
+    let input;
+    if(f.type==='textarea'){
+      input=document.createElement('textarea');
+      input.rows=3;
+    }else if(f.type==='select'){
+      input=document.createElement('select');
+      (f.opts||[]).forEach(o=>{
+        const opt=document.createElement('option');
+        opt.value=o.v;opt.textContent=o.t;
+        input.appendChild(opt);
+      });
+    }else{
+      input=document.createElement('input');
+      input.type=f.type;
+      if(f.im)input.inputMode=f.im;
+    }
+    input.id='fld_'+f.id;
+    input.placeholder=f.ph||'';
+    input.autocomplete='off';
+    input.addEventListener('input',validateForm);
+    input.addEventListener('change',validateForm);
+    g.appendChild(input);
+    wrap.appendChild(g);
+  });
+  validateForm();
+}
+function getFormValues(){
+  const cfg=FORMS[state.type];const v={};
+  (cfg?.fields||[]).forEach(f=>{
+    const el=document.getElementById('fld_'+f.id);
+    v[f.id]=el?el.value:'';
+  });
+  return v;
+}
+function validateForm(){
+  if(state.step!==2)return;
+  const cfg=FORMS[state.type];if(!cfg)return;
+  $('#nextBtn').disabled=!cfg.valid(getFormValues());
+}
+
+/* ---------- STEP 3 ---------- */
+function renderSwatches(){
+  const fg=$('#fgSwatches');fg.innerHTML='';
+  FG_COLORS.forEach(c=>{
+    const s=document.createElement('button');
+    s.className='swatch'+(state.fg===c?' selected':'');
+    s.style.background=c;
+    s.dataset.fg=c;
+    fg.appendChild(s);
+  });
+  const bg=$('#bgSwatches');bg.innerHTML='';
+  BG_COLORS.forEach(c=>{
+    const s=document.createElement('button');
+    s.className='swatch'+(state.bg===c?' selected':'');
+    s.style.background=c;
+    if(c==='#FFFFFF')s.style.boxShadow='inset 0 0 0 1px #E2E8F0';
+    s.dataset.bg=c;
+    bg.appendChild(s);
+  });
+}
+$('#fgSwatches').addEventListener('click',e=>{
+  const s=e.target.closest('.swatch');if(!s)return;
+  $$('#fgSwatches .swatch').forEach(x=>x.classList.remove('selected'));
+  s.classList.add('selected');
+  state.fg=s.dataset.fg;
+});
+$('#bgSwatches').addEventListener('click',e=>{
+  const s=e.target.closest('.swatch');if(!s)return;
+  $$('#bgSwatches .swatch').forEach(x=>x.classList.remove('selected'));
+  s.classList.add('selected');
+  state.bg=s.dataset.bg;
+});
+$('#sizeSeg').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  $$('#sizeSeg button').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  state.size=parseInt(b.dataset.size);
+});
+
+/* ---------- STEP 4: GENERATE ---------- */
+function showLoading(show,text){
+  $('#loading').classList.toggle('show',show);
+  if(text)$('#loadText').textContent=text;
+}
+function generate(){
+  if(typeof qrcode==='undefined'){
+    showLoading(true,'Loading library...');
+    setTimeout(generate,600);
+    return;
+  }
+  const cfg=FORMS[state.type];if(!cfg)return;
+  const data=cfg.build(getFormValues());
+  if(!data){toast('Please check the input values.','err');return;}
+  state.data=data;
+
+  let qr;
+  try{qr=qrcode(0,'M');qr.addData(data);qr.make();}
+  catch(e){
+    try{qr=qrcode(0,'L');qr.addData(data);qr.make();}
+    catch(e2){toast('Content is too long. Try shorter text.','err');return;}
+  }
+
+  const canvas=$('#qrCanvas');
+  drawQR(canvas,qr,state.fg,state.bg,state.size,4,true);
+
+  $('#resultType').textContent=TYPES[state.type].label;
+  $('#resultDate').textContent=fmtDate(Date.now());
+  $('#resultData').textContent=data.length>140?data.slice(0,140)+'…':data;
+
+  addHistory({
+    id:Date.now(),
+    type:state.type,
+    label:TYPES[state.type].label,
+    data:data,
+    fg:state.fg,bg:state.bg,size:state.size,
+    created:Date.now()
+  });
+
+  setStep(4);
+  toast('QR code generated successfully','ok');
+}
+
+function drawQR(canvas,qr,fg,bg,cellSize,margin,withBranding){
+  const modules=qr.getModuleCount();
+  const baseSize=(modules+margin*2)*cellSize;
+  const extraH=withBranding?58:0;
+  const W=baseSize, H=baseSize+extraH;
+
+  const maxDisplay=Math.min(300, window.innerWidth-140);
+  const scale=maxDisplay/W;
+  const dpr=Math.max(2, window.devicePixelRatio||1);
+
+  canvas.style.width=(W*scale)+'px';
+  canvas.style.height=(H*scale)+'px';
+  canvas.width=W*dpr;
+  canvas.height=H*dpr;
+  canvas.dataset.baseW=W;
+  canvas.dataset.baseH=H;
+  canvas.dataset.dpr=dpr;
+
+  const ctx=canvas.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.fillStyle=bg;
+  ctx.fillRect(0,0,W,H);
+
+  ctx.fillStyle=fg;
+  for(let r=0;r<modules;r++){
+    for(let c=0;c<modules;c++){
+      if(qr.isDark(r,c)){
+        ctx.fillRect((c+margin)*cellSize,(r+margin)*cellSize,cellSize,cellSize);
+      }
+    }
+  }
+
+  if(withBranding){
+    const y=baseSize;
+    const label=TYPES[state.type]?.label||'QR Code';
+    ctx.fillStyle=fg;
+    ctx.globalAlpha=.75;
+    ctx.font='600 '+Math.round(cellSize*1.55)+'px -apple-system, "Segoe UI", Roboto, sans-serif';
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    ctx.fillText('Scan with your camera · '+label, W/2, y+22);
+    ctx.globalAlpha=.45;
+    ctx.font='800 '+Math.round(cellSize*1.15)+'px -apple-system, "Segoe UI", Roboto, sans-serif';
+    ctx.fillText('QR STUDIO', W/2, y+40);
+    ctx.globalAlpha=1;
+  }
+}
+
+/* ---------- DOWNLOAD / SHARE / COPY ---------- */
+function downloadQR(){
+  const canvas=$('#qrCanvas');
+  const W=parseInt(canvas.dataset.baseW);
+  const H=parseInt(canvas.dataset.baseH);
+  const dpr=parseInt(canvas.dataset.dpr);
+
+  const out=document.createElement('canvas');
+  const ES=2;
+  out.width=W*ES;
+  out.height=H*ES;
+  const ctx=out.getContext('2d');
+  ctx.imageSmoothingEnabled=false;
+  ctx.drawImage(canvas,0,0,W*dpr,H*dpr,0,0,W*ES,H*ES);
+
+  out.toBlob(blob=>{
+    if(!blob){toast('Download failed. Try again.','err');return;}
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    const stamp=new Date().toISOString().slice(0,10);
+    a.href=url;
+    a.download=`qrstudio-${state.type}-${stamp}.png`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(url),2000);
+    toast('QR code downloaded as PNG','ok');
+  },'image/png');
+}
+async function copyData(){
+  try{
+    await navigator.clipboard.writeText(state.data);
+    toast('Data copied to clipboard','ok');
+  }catch(e){toast('Copy is not supported on this device','err');}
+}
+async function shareQR(){
+  const canvas=$('#qrCanvas');
+  try{
+    canvas.toBlob(async blob=>{
+      const file=new File([blob],'qr-code.png',{type:'image/png'});
+      if(navigator.canShare && navigator.canShare({files:[file]})){
+        await navigator.share({files:[file],title:'QR Code',text:state.data});
+      }else if(navigator.share){
+        await navigator.share({title:'QR Code',text:state.data});
+      }else{
+        toast('Sharing is not supported on this device','err');
+      }
+    },'image/png');
+  }catch(e){
+    if(e.name!=='AbortError')toast('Share cancelled','err');
+  }
+}
+
+/* ---------- NAV ---------- */
+$('#nextBtn').addEventListener('click',()=>{
+  if(state.step===1){
+    if(!state.type){toast('Please select a type first','err');return;}
+    renderForm();
+    setStep(2);
+  }else if(state.step===2){
+    if($('#nextBtn').disabled)return;
+    setStep(3);
+  }else if(state.step===3){
+    showLoading(true,'Generating QR code...');
+    $('#nextBtn').disabled=true;
+    setTimeout(()=>{
+      generate();
+      showLoading(false);
+      $('#nextBtn').disabled=false;
+    },380);
+  }
+});
+$('#backBtn').addEventListener('click',()=>{
+  if(state.step>1)setStep(state.step-1,true);
+});
+$('#newBtn').addEventListener('click',()=>{
+  state.type=null;state.data='';
+  $$('.type-card').forEach(c=>c.classList.remove('selected'));
+  $('#foot').classList.remove('hide');
+  state.cat='popular';
+  $$('.cat-tab').forEach(t=>t.classList.toggle('active',t.dataset.cat==='popular'));
+  renderTypeGrid();
+  setStep(1);
+});
+$('#downloadBtn').addEventListener('click',downloadQR);
+$('#copyBtn').addEventListener('click',copyData);
+$('#shareBtn').addEventListener('click',shareQR);
+
+/* ---------- HISTORY SLIDE ---------- */
+function openHistory(){
+  $('#histPanel').classList.add('show');
+  $('#histOverlay').classList.add('show');
+  renderHistory();
+  document.body.style.overflow='hidden';
+}
+function closeHistory(){
+  $('#histPanel').classList.remove('show');
+  $('#histOverlay').classList.remove('show');
+  document.body.style.overflow='';
+}
+$('#histBtn').addEventListener('click',openHistory);
+$('#histBack').addEventListener('click',closeHistory);
+$('#histOverlay').addEventListener('click',closeHistory);
+$('#histClear').addEventListener('click',()=>{
+  if(!state.history.length){toast('History is already empty','info');return;}
+  if(confirm('Clear all QR history? This cannot be undone.')){
+    state.history=[];
+    saveHistory();
+    renderHistory();
+    toast('History cleared','ok');
+  }
+});
+
+function renderHistory(){
+  const body=$('#histBody');
+  updateBadge();
+
+  if(!state.history.length){
+    body.innerHTML=`
+      <div class="hist-empty">
+        <div class="hist-empty-ic">
+          <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg>
+        </div>
+        <h3>No QR codes yet</h3>
+        <p>Your generated QR codes will appear here for quick access.</p>
+      </div>`;
+    return;
+  }
+
+  // Group by date
+  const groups={};
+  state.history.forEach(item=>{
+    const d=new Date(item.created);
+    const today=new Date();today.setHours(0,0,0,0);
+    const yesterday=new Date(today);yesterday.setDate(yesterday.getDate()-1);
+    let label;
+    if(d>=today)label='Today';
+    else if(d>=yesterday)label='Yesterday';
+    else if((today-d)<604800000)label='This week';
+    else label='Earlier';
+    (groups[label]=groups[label]||[]).push(item);
+  });
+
+  const order=['Today','Yesterday','This week','Earlier'];
+  body.innerHTML='';
+  order.forEach(group=>{
+    if(!groups[group])return;
+    const lb=document.createElement('div');
+    lb.className='hist-group-lb';
+    lb.textContent=group;
+    body.appendChild(lb);
+
+    groups[group].forEach((item,idx)=>{
+      const t=TYPES[item.type]||{icon:'url',label:item.type};
+      const row=document.createElement('div');
+      row.className='hist-item';
+      row.style.animationDelay=(idx*.03)+'s';
+      row.innerHTML=`
+        <div class="hist-ic"><svg viewBox="0 0 24 24">${IC[t.icon]||IC.url}</svg></div>
+        <div class="hist-info">
+          <div class="hist-type">${item.label||t.label}</div>
+          <div class="hist-data">${(item.data||'').replace(/</g,'&lt;')}</div>
+          <div class="hist-time">${timeAgo(item.created)}</div>
+        </div>
+        <button class="hist-del" aria-label="Delete">
+          <svg viewBox="0 0 24 24">${IC.trash}</svg>
+        </button>`;
+
+      row.querySelector('.hist-info').addEventListener('click',()=>loadFromHistory(item));
+      row.querySelector('.hist-ic').addEventListener('click',()=>loadFromHistory(item));
+      row.querySelector('.hist-del').addEventListener('click',ev=>{
+        ev.stopPropagation();
+        state.history=state.history.filter(h=>h.id!==item.id);
+        saveHistory();
+        renderHistory();
+        toast('Removed from history','ok');
+      });
+      body.appendChild(row);
+    });
+  });
+}
+
+function loadFromHistory(item){
+  closeHistory();
+  state.type=item.type;
+  state.fg=item.fg||'#0F172A';
+  state.bg=item.bg||'#FFFFFF';
+  state.size=item.size||10;
+  state.data=item.data;
+
+  if(typeof qrcode==='undefined'){toast('Loading library...','info');return;}
+  let qr;
+  try{qr=qrcode(0,'M');qr.addData(item.data);qr.make();}
+  catch(e){
+    try{qr=qrcode(0,'L');qr.addData(item.data);qr.make();}
+    catch(e2){toast('Cannot load this QR code','err');return;}
+  }
+
+  const canvas=$('#qrCanvas');
+  drawQR(canvas,qr,state.fg,state.bg,state.size,4,true);
+  $('#resultType').textContent=item.label||TYPES[item.type]?.label||item.type;
+  $('#resultDate').textContent=fmtDate(item.created);
+  $('#resultData').textContent=item.data.length>140?item.data.slice(0,140)+'…':item.data;
+
+  $('#foot').classList.add('hide');
+  state.step=4;
+  $$('.pane').forEach(p=>p.classList.remove('active','back'));
+  document.querySelector('.pane[data-pane="4"]').classList.add('active');
+  $('#progFill').style.width='100%';
+  $$('[data-lb]').forEach(lb=>lb.classList.toggle('active',lb.dataset.lb==='4'));
+  $('#backBtn').style.display='none';
+  $('#main').scrollTop=0;
+}
+
+/* ---------- INIT ---------- */
+(function init(){
+  renderTypeGrid();
+  renderSwatches();
+  loadHistory();
+
+  if('serviceWorker' in navigator){
+    window.addEventListener('load',()=>{
+      navigator.serviceWorker.register('sw.js').catch(()=>{});
+    }); 
+
+  }
+})();
+</script>
+</body>
+</html>
